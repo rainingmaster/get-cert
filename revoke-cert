@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+username=$1
+
+# default setting in /etc/pki/tls/openssl.cnf
+openssl ca -revoke ${username}-cert.pem
+openssl ca -gencrl -out /etc/pki/CA/crl/rain.crl 
+#openssl ca -gencrl -config /etc/openssl.cnf -crldays 7 -crlexts crl_ext -out crl/sopac-ca.crl

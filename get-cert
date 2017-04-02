@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+username=$1
+sed $"s/SOMEONE/$username/" openssl-req.cnf.tpl > ${username}-openssl-req.cnf
+echo "------cert for ${username}-------"
+
+echo "prepare cert request"
+# 6 \n for default setting
+echo "
+
+
+
+
+
+" | openssl req -config ${username}-openssl-req.cnf -newkey rsa:2048 -sha256 -nodes -out ${username}-cert.csr -outform PEM || exit 1
+#openssl req -text -noout -verify -in ${username}-cert.csr || exit 1
+
+# 2 y for sign cert
+echo "y
+y" | openssl ca -policy signing_policy -extensions signing_req -out ${username}-cert.pem -infiles ${username}-cert.csr || exit 1
+#openssl x509 -in ${username}-cert.pem -text -noout
+echo
+
+#change to p12 for windows
+openssl pkcs12 -export -inkey ${username}-key.pem -in ${username}-cert.pem -out ${username}.pfx
